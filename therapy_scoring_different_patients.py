@@ -6,40 +6,45 @@ import plotly.graph_objects as go
 
 st.title("Exoskeleton Therapy Progress Dashboard")
 
-@st.cache_data
-def load_data():
-    url = "Patient_3.csv"
-    return pd.read_csv(url)
+# Example files dictionary
+EXAMPLE_FILES = {
+    "Patient 1": "Patient_1.csv",
+    "Patient 2": "Patient_2.csv",  # Add more as needed
+    "Patient 3": "Patient_3.csv",  # Add more as needed
+}
 
-df = load_data()
+# File selection
+selected_example = st.selectbox("Select an example dataset", list(EXAMPLE_FILES.keys()))
+file_path = EXAMPLE_FILES[selected_example]
+df = pd.read_csv(file_path)
 
-# Show raw data
+# Display raw data
 with st.expander("Show raw dataset"):
     st.dataframe(df)
 
-# Select one or more metrics
+# Select metrics
 metrics = [col for col in df.columns if col != "Session"]
-selected_metrics = st.multiselect("Select metrics to visualize:", metrics, default=[metrics[0]])
+selected_metrics = st.multiselect("Select metrics to visualize:", metrics, default=[metrics[0]] if metrics else [])
 
 # Plot selected metrics over sessions
-st.subheader("Selected Metrics Over Time")
-sns.set(style="whitegrid")
-fig, ax = plt.subplots(figsize=(12, 6))
-for metric in selected_metrics:
-    sns.lineplot(data=df, x="Session", y=metric, marker="o", label=metric, ax=ax)
-ax.set_xlabel("Session")
-ax.set_ylabel("Value")
-ax.legend()
-st.pyplot(fig)
+if selected_metrics:
+    st.subheader("Selected Metrics Over Time")
+    sns.set(style="whitegrid")
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for metric in selected_metrics:
+        sns.lineplot(data=df, x="Session", y=metric, marker="o", label=metric, ax=ax)
+    ax.set_xlabel("Session")
+    ax.set_ylabel("Value")
+    ax.legend()
+    st.pyplot(fig)
 
-# Session comparison with radar chart
+# Radar chart comparison
 st.subheader("Compare Two Sessions (Radar Chart)")
 session_options = df["Session"].tolist()
 session1 = st.selectbox("Select Session 1", session_options, index=0)
 session2 = st.selectbox("Select Session 2", session_options, index=len(session_options)-1)
 
 def radar_chart(data, session1, session2, metrics):
-
     s1_data = data[data["Session"] == session1][metrics].values.flatten()
     s2_data = data[data["Session"] == session2][metrics].values.flatten()
 
@@ -50,7 +55,7 @@ def radar_chart(data, session1, session2, metrics):
     fig.update_layout(polar=dict(radialaxis=dict(visible=True)), showlegend=True)
     return fig
 
-radar_metrics = st.multiselect("Metrics for Radar Chart", metrics, default=metrics[:5])
+radar_metrics = st.multiselect("Metrics for Radar Chart", metrics, default=metrics[:5] if len(metrics) >= 5 else metrics)
 if radar_metrics:
     radar_fig = radar_chart(df, session1, session2, radar_metrics)
     st.plotly_chart(radar_fig, use_container_width=True)
