@@ -11,6 +11,8 @@ st.write("Explore Therapy data from three different patients. What do you see? "
 
 st.write("These are simulated data sets based on real world examples.")
 
+st.write("Tip: look at the metrics individually first, try to interpret them and then combine several metrics to see their interdependence")
+
 st.write("Discuss your findings within your group and post them in slido. Happy digging!")
 
 # Example files dictionary
