@@ -4,7 +4,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.graph_objects as go
 
-st.title("Exoskeleton Therapy Progress Dashboard")
+st.title("Data Exploration")
+st.write("Explore Therapy data from three different patients. What do you see? " +
+         "Look for trends, anomalies, outliers, etc. " +
+         "Can you explain certain dynamics and correlations?")
+
+st.write("These are simulated data sets based on real world examples.")
+
+st.write("Discuss your findings within your group and post them in slido. Happy digging!")
 
 # Example files dictionary
 EXAMPLE_FILES = {
@@ -14,7 +21,7 @@ EXAMPLE_FILES = {
 }
 
 # File selection
-selected_example = st.selectbox("Select an example dataset", list(EXAMPLE_FILES.keys()))
+selected_example = st.selectbox("Select a patient", list(EXAMPLE_FILES.keys()))
 file_path = EXAMPLE_FILES[selected_example]
 df = pd.read_csv(file_path)
 
@@ -42,7 +49,8 @@ if selected_metrics:
 st.subheader("Compare Two Sessions (Radar Chart)")
 session_options = df["Session"].tolist()
 session1 = st.selectbox("Select Session 1", session_options, index=0)
-session2 = st.selectbox("Select Session 2", session_options, index=len(session_options)-1)
+session2 = st.selectbox("Select Session 2", session_options, index=len(session_options) - 1)
+
 
 def radar_chart(data, session1, session2, metrics):
     s1_data = data[data["Session"] == session1][metrics].values.flatten()
@@ -55,7 +63,9 @@ def radar_chart(data, session1, session2, metrics):
     fig.update_layout(polar=dict(radialaxis=dict(visible=True)), showlegend=True)
     return fig
 
-radar_metrics = st.multiselect("Metrics for Radar Chart", metrics, default=metrics[:5] if len(metrics) >= 5 else metrics)
+
+radar_metrics = st.multiselect("Metrics for Radar Chart", metrics,
+                               default=metrics[:5] if len(metrics) >= 5 else metrics)
 if radar_metrics:
     radar_fig = radar_chart(df, session1, session2, radar_metrics)
     st.plotly_chart(radar_fig, use_container_width=True)
@@ -68,12 +78,12 @@ sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", ax=ax_corr)
 st.pyplot(fig_corr)
 
 # Improvement summary
-st.subheader("Improvement Summary")
-improvements = {}
-for metric in metrics:
-    first = df[metric].iloc[0]
-    last = df[metric].iloc[-1]
-    improvement = ((last - first) / first) * 100
-    improvements[metric] = round(improvement, 2)
-improvement_df = pd.DataFrame(list(improvements.items()), columns=["Metric", "Percent Improvement"])
-st.dataframe(improvement_df.sort_values(by="Percent Improvement", ascending=False))
+#st.subheader("Improvement Summary")
+#improvements = {}
+#for metric in metrics:
+#    first = df[metric].iloc[0]
+#    last = df[metric].iloc[-1]
+#    improvement = ((last - first) / first) * 100
+#    improvements[metric] = round(improvement, 2)
+#improvement_df = pd.DataFrame(list(improvements.items()), columns=["Metric", "Percent Improvement"])
+#st.dataframe(improvement_df.sort_values(by="Percent Improvement", ascending=False))
